@@ -702,7 +702,48 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseDTO'
-
+                
+  /epa/testdriver/api/v1/devicemanagement/confirmation:
+    parameters:
+      - in: header
+        name: confirmationCode
+        schema:
+          type: string
+          pattern: '^\d{6}$'
+          example: '123456'
+        description: 6-digit confirmation code for device registration confirmation.
+        required: true
+    post:
+      tags:
+        - Device Management
+      summary: 'Enter device registration code (Confirmation Code)'
+      description: 'This request sends the confirmationCode to the Device Management Service, to confirm a pending device registration. '
+      operationId: postConfirmationCode
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDTO'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfirmationCodeErrorType'
+              examples:
+                ConfirmationCode_invalid:
+                  summary: Confirmation failed
+                  value:
+                    errorCode: invalidCode
+                    errorDetail: "2"
+                ConfirmationCode_invalid_blocked:
+                  summary: Confirmation failed
+                  value:
+                    errorCode: invalidCode
+                    errorDetail: "0"
+  
   /epa/testdriver/api/v1/medication:
     get:
       tags:
@@ -1247,6 +1288,13 @@ components:
             - SigdUrl
         configurationEntryValue:
           type: string
+    ConfirmationCodeErrorType:
+      type: object
+      properties:
+        errorCode:
+          type: string
+        errorDetail:
+          type: string          
     GetEntitlementListResponseDTO:
       description: 'Returns a list of all entitlements'
       allOf:
